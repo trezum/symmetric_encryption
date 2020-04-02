@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Text;
 
 namespace symmetric_encryption
 {
@@ -16,6 +18,15 @@ namespace symmetric_encryption
                 hex.AppendFormat("{0:x2}", ba[i]);
             }
             return hex.ToString();
+        }
+
+        public static byte[] ToByteArray(this string hex)
+        {
+            var removedSpaces = hex.Replace(" ", string.Empty);
+            return Enumerable.Range(0, removedSpaces.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(removedSpaces.Substring(x, 2), 16))
+                             .ToArray();
         }
     }
 }
