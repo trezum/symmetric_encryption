@@ -8,10 +8,14 @@ namespace symmetric_encryption
     {
         // Credit to: https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aes?view=netframework-4.8
 
-        // To use the program start by generateing a key and initialization vector and enter them here.
+        // To use the program:
+        // Select encoding or use the default.
+        // Generate a key and initialization vector and enter them in the variables below
         // Never share your key and initialization vector in an unencrypted manner.
-        private static readonly string _key = "";
-        private static readonly string _iv = "";
+        private static readonly Encoding _encoding = Encoding.Base64;
+        private static readonly string _iv = "QW+rLzLK0UGB1r4A7gfv7A==";
+        private static readonly string _key = "3d8Y5KHn9NR58cqIOcKkZmB6B8H+VsPKG1mwZDeBNWE=";
+
         static void Main(string[] args)
         {
             while (true)
@@ -43,7 +47,6 @@ namespace symmetric_encryption
                     {
                         return;
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -60,8 +63,8 @@ namespace symmetric_encryption
             {
                 using (Aes myAes = Aes.Create())
                 {
-                    Console.WriteLine("IV:          {0}", myAes.IV.ToHexString());
-                    Console.WriteLine("Key:         {0}", myAes.Key.ToHexString());
+                    Console.WriteLine("IV:          {0}", Encode(myAes.IV));
+                    Console.WriteLine("Key:         {0}", Encode(myAes.Key));
                     Console.WriteLine();
                     var selection = Console.ReadKey();
                     Console.WriteLine();
@@ -70,8 +73,9 @@ namespace symmetric_encryption
                         return;
                     }
                 }
+
                 Console.WriteLine("Press Q to [Q]uit.");
-                Console.WriteLine("Press any key to generate a new Key and IV.");
+                Console.WriteLine("Press any other key to generate a new Key and IV.");
             }
         }
 
@@ -79,14 +83,14 @@ namespace symmetric_encryption
         {
             while (true)
             {
-                Console.WriteLine("Press Q to [Q]uit.");
+                Console.WriteLine("Enter Q to [Q]uit.");
                 Console.WriteLine("Enter hex blocks to decrypt: ");
                 var textToDecrypt = Console.ReadLine();
                 if (ShouldQuit(textToDecrypt))
                 {
                     return;
                 }
-                Console.WriteLine(DecryptStringFromBytes_Aes(textToDecrypt.ToByteArray(), _key.ToByteArray(), _iv.ToByteArray()));
+                Console.WriteLine(DecryptStringFromBytes_Aes(Decode(textToDecrypt), Decode(_key), Decode(_iv)));
             }
         }
 
@@ -94,16 +98,41 @@ namespace symmetric_encryption
         {
             while (true)
             {
-                Console.WriteLine("Press Q to [Q]uit.");
+                Console.WriteLine("Enter Q to [Q]uit.");
                 Console.WriteLine("Enter the text to encrypt: ");
                 var textToEncrypt = Console.ReadLine();
                 if (ShouldQuit(textToEncrypt))
                 {
                     return;
                 }
-                Console.WriteLine(EncryptStringToBytes_Aes(textToEncrypt, _key.ToByteArray(), _iv.ToByteArray()).ToHexString());
+                Console.WriteLine(Encode(EncryptStringToBytes_Aes(textToEncrypt, Decode(_key), Decode(_iv))));
             }
         }
+
+        private static string Encode(byte[] data)
+        {
+            switch (_encoding)
+            {
+                case Encoding.Hex:
+                    return data.ToHexString();
+                case Encoding.Base64:
+                    return data.ToBase64String();
+                default: throw new NotImplementedException();
+            }
+        }
+
+        private static byte[] Decode(string data)
+        {
+            switch (_encoding)
+            {
+                case Encoding.Hex:
+                    return data.FromHexToByteArray();
+                case Encoding.Base64:
+                    return data.FromBase64ToByteArray();
+                default: throw new NotImplementedException();
+            }
+        }
+
 
         static bool ShouldQuit(string inputString)
         {
