@@ -3,6 +3,7 @@
     internal enum Encoding
     {
         Hex,
-        Base64
+        Base64,
+        Base16K
     }
 }

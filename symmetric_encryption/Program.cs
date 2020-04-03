@@ -6,18 +6,25 @@ namespace symmetric_encryption
 {
     class Program
     {
-        // Credit to: https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aes?view=netframework-4.8
+        // Credit to: https://docs.microsoft.com/en-us/dotnet/api/system.security.cryptography.aes
+        // Base16K source: https://github.com/JDanielSmith/Base16k
 
         // To use the program:
         // Select encoding or use the default.
         // Generate a key and initialization vector and enter them in the variables below
         // Never share your key and initialization vector in an unencrypted manner.
         private static readonly Encoding _encoding = Encoding.Base64;
-        private static readonly string _iv = "QW+rLzLK0UGB1r4A7gfv7A==";
-        private static readonly string _key = "3d8Y5KHn9NR58cqIOcKkZmB6B8H+VsPKG1mwZDeBNWE=";
+        private static readonly string _iv = "";
+        private static readonly string _key = "";
 
         static void Main(string[] args)
         {
+            if (_encoding == Encoding.Base16K)
+            {
+                Console.OutputEncoding = System.Text.Encoding.Unicode;
+                Console.InputEncoding = System.Text.Encoding.Unicode;
+            }
+
             while (true)
             {
                 try
@@ -117,6 +124,8 @@ namespace symmetric_encryption
                     return data.ToHexString();
                 case Encoding.Base64:
                     return data.ToBase64String();
+                case Encoding.Base16K:
+                    return JDanielSmith.Convert.ToBase16KString(data);
                 default: throw new NotImplementedException();
             }
         }
@@ -129,10 +138,11 @@ namespace symmetric_encryption
                     return data.FromHexToByteArray();
                 case Encoding.Base64:
                     return data.FromBase64ToByteArray();
+                case Encoding.Base16K:
+                    return JDanielSmith.Convert.FromBase16KString(data);
                 default: throw new NotImplementedException();
             }
         }
-
 
         static bool ShouldQuit(string inputString)
         {
